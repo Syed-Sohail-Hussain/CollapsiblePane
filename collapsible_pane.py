@@ -1,107 +1,103 @@
 from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QAbstractAnimation
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QToolButton, QFrame, QScrollArea,
-    QGridLayout, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy
+    QWidget, QToolButton, QScrollArea, QGridLayout, QVBoxLayout,
+    QHBoxLayout, QLabel, QPushButton, QSizePolicy, QApplication, QMainWindow
 )
 import sys
 
 
-class Section(QWidget):
-    def __init__(self, title="", animationDuration=100, parent=None):
+class CollapsiblePane(QWidget):
+    def __init__(self, title="", animation_duration=100, parent=None):
         super().__init__(parent)
-        self.animationDuration = animationDuration
-        self.toggleButton = QToolButton(self)
-        self.headerLine = QFrame(self)
-        self.toggleAnimation = QParallelAnimationGroup(self)
-        self.contentArea = QScrollArea(self)
-        self.mainLayout = QGridLayout(self)
+        self.animation_duration = animation_duration
 
-        self.toggleButton.setStyleSheet("QToolButton {border: none;}")
-        self.toggleButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-        self.toggleButton.setArrowType(Qt.RightArrow)
-        self.toggleButton.setText(title)
-        self.toggleButton.setCheckable(True)
-        self.toggleButton.setChecked(False)
+        self.toggle_button = QToolButton(self)
+        self.toggle_animation = QParallelAnimationGroup(self)
+        self.content_area = QScrollArea(self)
+        self.main_layout = QGridLayout(self)
 
-        self.headerLine.setFrameShape(QFrame.HLine)
-        self.headerLine.setFrameShadow(QFrame.Sunken)
-        self.headerLine.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
+        # Toggle button style and behavior
+        self.toggle_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.toggle_button.setArrowType(Qt.RightArrow)
+        self.toggle_button.setText(title)
+        self.toggle_button.setCheckable(True)
+        self.toggle_button.setChecked(False)
+        self.toggle_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.toggle_button.setStyleSheet(self._generate_button_style("#444", "#eee"))  # default colors
 
-        self.contentArea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.contentArea.setMaximumHeight(0)
-        self.contentArea.setMinimumHeight(0)
+        # Content area settings
+        self.content_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.content_area.setMaximumHeight(0)
+        self.content_area.setMinimumHeight(0)
+        self.content_area.setStyleSheet("QScrollArea { background-color: transparent; border: none; }")
 
-        self.toggleAnimation.addAnimation(QPropertyAnimation(self, b"minimumHeight"))
-        self.toggleAnimation.addAnimation(QPropertyAnimation(self, b"maximumHeight"))
-        self.toggleAnimation.addAnimation(QPropertyAnimation(self.contentArea, b"maximumHeight"))
+        # Add animations
+        self.toggle_animation.addAnimation(QPropertyAnimation(self, b"minimumHeight"))
+        self.toggle_animation.addAnimation(QPropertyAnimation(self, b"maximumHeight"))
+        self.toggle_animation.addAnimation(QPropertyAnimation(self.content_area, b"maximumHeight"))
 
-        self.mainLayout.setVerticalSpacing(0)
-        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        # Layout
+        self.main_layout.setVerticalSpacing(0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.addWidget(self.toggle_button, 0, 0)
+        self.main_layout.addWidget(self.content_area, 1, 0)
+        self.setLayout(self.main_layout)
 
-        row = 0
-        self.mainLayout.addWidget(self.toggleButton, row, 0, 1, 1, Qt.AlignLeft)
-        self.mainLayout.addWidget(self.headerLine, row, 2, 1, 1)
-        self.mainLayout.addWidget(self.contentArea, row + 1, 0, 1, 3)
-        self.setLayout(self.mainLayout)
+        self.toggle_button.toggled.connect(self.toggle)
 
-        self.toggleButton.toggled.connect(self.toggle)
+    def _generate_button_style(self, bg_color: str, fg_color: str) -> str:
+        return f"""
+        QToolButton {{
+            background-color: {bg_color};
+            color: {fg_color};
+            border: none;
+            padding: 6px;
+            font-weight: bold;
+        }}
+        QToolButton::menu-indicator {{ image: none; }}
+        """
 
-    def setContentLayout(self, contentLayout):
-        oldLayout = self.contentArea.layout()
+    def set_content_style(self, background_color="#ffffff", border_color="#cccccc", border_width=1, border_style="solid"):
+        self.content_area.setStyleSheet(f"""
+        QScrollArea {{
+            background-color: {background_color};
+            border: {border_width}px {border_style} {border_color};
+            border-radius: 4px;
+        }}
+        """)
+
+
+    def set_title_bar_style(self, background_color: str, foreground_color: str):
+        self.toggle_button.setStyleSheet(
+            self._generate_button_style(background_color, foreground_color)
+        )
+
+    def set_content_layout(self, content_layout):
+        oldLayout = self.content_area.layout()
         if oldLayout is not None:
-            QWidget().setLayout(oldLayout)  # Clear previous layout safely
+            QWidget().setLayout(oldLayout)
 
-        self.contentArea.setLayout(contentLayout)
+        self.content_area.setLayout(content_layout)
 
-        collapsedHeight = self.sizeHint().height() - self.contentArea.maximumHeight()
-        contentHeight = contentLayout.sizeHint().height()
+        collapsedHeight = self.sizeHint().height() - self.content_area.maximumHeight()
+        contentHeight = content_layout.sizeHint().height()
 
-        for i in range(self.toggleAnimation.animationCount() - 1):
-            animation = self.toggleAnimation.animationAt(i)
-            animation.setDuration(self.animationDuration)
+        for i in range(self.toggle_animation.animationCount() - 1):
+            animation = self.toggle_animation.animationAt(i)
+            animation.setDuration(self.animation_duration)
             animation.setStartValue(collapsedHeight)
             animation.setEndValue(collapsedHeight + contentHeight)
 
-        contentAnimation = self.toggleAnimation.animationAt(self.toggleAnimation.animationCount() - 1)
-        contentAnimation.setDuration(self.animationDuration)
+        contentAnimation = self.toggle_animation.animationAt(self.toggle_animation.animationCount() - 1)
+        contentAnimation.setDuration(self.animation_duration)
         contentAnimation.setStartValue(0)
         contentAnimation.setEndValue(contentHeight)
 
     def toggle(self, collapsed):
         if collapsed:
-            self.toggleButton.setArrowType(Qt.DownArrow)
-            self.toggleAnimation.setDirection(QAbstractAnimation.Forward)
+            self.toggle_button.setArrowType(Qt.DownArrow)
+            self.toggle_animation.setDirection(QAbstractAnimation.Forward)
         else:
-            self.toggleButton.setArrowType(Qt.RightArrow)
-            self.toggleAnimation.setDirection(QAbstractAnimation.Backward)
-        self.toggleAnimation.start()
-
-
-if __name__ == '__main__':
-    class Window(QMainWindow):
-        def __init__(self, parent=None):
-            super().__init__(parent)
-            section = Section("Section", 100, self)
-
-            anyLayout = QVBoxLayout()
-            anyLayout.addWidget(QLabel("Some Text in Section", section))
-            anyLayout.addWidget(QPushButton("Button in Section", section))
-            anyLayout.addWidget(QPushButton("Button in Section", section))
-            anyLayout.addWidget(QPushButton("Button in Section", section))
-            anyLayout.addWidget(QPushButton("Button in Section", section))
-            anyLayout.addWidget(QPushButton("Button in Section", section))
-            anyLayout.addWidget(QPushButton("Button in Section", section))
-
-
-            section.setContentLayout(anyLayout)
-
-            self.place_holder = QWidget()
-            mainLayout = QHBoxLayout(self.place_holder)
-            mainLayout.addWidget(section)
-            mainLayout.addStretch(1)
-            self.setCentralWidget(self.place_holder)
-
-    app = QApplication(sys.argv)
-    window = Window()
-    window.show()
-    sys.exit(app.exec())
+            self.toggle_button.setArrowType(Qt.RightArrow)
+            self.toggle_animation.setDirection(QAbstractAnimation.Backward)
+        self.toggle_animation.start()
