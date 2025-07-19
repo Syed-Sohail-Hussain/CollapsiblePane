@@ -16,20 +16,6 @@ Inspired by JavaFX's TitledPane.
 
 ---
 
-## Installation
-
-```bash
-pip install collapsiblepane
-```
-
-Or if you're testing locally:
-
-```bash
-pip install dist/collapsiblepane-0.1.0-py3-none-any.whl
-```
-
----
-
 ## Usage
 
 ```python
@@ -125,9 +111,9 @@ if __name__ == "__main__":
 
 ## Screenshot
 
-| Collapsed | Expanded |
-| --------- | -------- |
-|![Collapsed View](https://raw.githubusercontent.com/mjk22071998/CollapsiblePane/refs/heads/main/screenshot/expanded.PNG)|![Expanded View](https://raw.githubusercontent.com/mjk22071998/CollapsiblePane/refs/heads/main/screenshot/expanded.PNG)|
+| Collapsed                                                                                                                 | Expanded |
+|---------------------------------------------------------------------------------------------------------------------------| -------- |
+| ![Collapsed View](https://raw.githubusercontent.com/mjk22071998/CollapsiblePane/refs/heads/main/screenshot/collapsed.PNG) |![Expanded View](https://raw.githubusercontent.com/mjk22071998/CollapsiblePane/refs/heads/main/screenshot/expanded.PNG)|
 
 > Ensure these URLs point to actual image files in your GitHub repo. Raw links must be used for PyPI to render them.
 
