@@ -32,7 +32,7 @@ A custom QWidget subclass that includes:
 
 | Collapsed | Expanded |
 | --------- | -------- |
-|           |          |
+|      ![Collapsed View](screenshot/collapsed.PNG)     | ![Expanded View](screenshot/expanded.PNG) |
 
 ---
 
