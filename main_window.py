@@ -12,57 +12,62 @@ class Window(QMainWindow):
         super().__init__(parent)
         self.setWindowTitle("Flex Zone 🧩")
 
-        section = CollapsiblePane("🔥 Ultimate Pane of Power", 250, self)
+        # Create the collapsible pane
+        section = CollapsiblePane("🔥 Ultimate Pane of Power", 150, self)
 
         # 🎨 Customize title bar
-        section.set_title_bar_style(background_color="#222831", foreground_color="#FFD369")
+        section.set_title_bar_style(background_color="#0066ff", foreground_color="#FFFFFF")
         section.set_content_style(
-            background_color="#393E46",
-            border_color="#FFD369",
+            background_color="#FFFFFF",
+            border_color="#0066FF",
             border_width=2,
             border_style="solid"
         )
 
-        # 💎 Add a bunch of widgets to show off
-        contentLayout = QVBoxLayout()
+        # 💎 Create a widget to hold the layout
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
 
-        contentLayout.addWidget(QLabel("📝 Enter your details:"))
-        contentLayout.addWidget(QLineEdit("Name here..."))
-        contentLayout.addWidget(QLineEdit("Email address..."))
+        content_layout.addWidget(QLabel("📝 Enter your details:"))
+        content_layout.addWidget(QLineEdit("Name here..."))
+        content_layout.addWidget(QLineEdit("Email address..."))
 
-        contentLayout.addWidget(QLabel("🔽 Choose a category:"))
+        content_layout.addWidget(QLabel("🔽 Choose a category:"))
         combo = QComboBox()
         combo.addItems(["Developer", "Designer", "Hacker", "Wizard"])
-        contentLayout.addWidget(combo)
+        content_layout.addWidget(combo)
 
-        contentLayout.addWidget(QCheckBox("Subscribe to newsletter 📬"))
-        contentLayout.addWidget(QRadioButton("Light Mode ☀️"))
-        contentLayout.addWidget(QRadioButton("Dark Mode 🌙"))
+        content_layout.addWidget(QCheckBox("Subscribe to newsletter 📬"))
+        content_layout.addWidget(QRadioButton("Light Mode ☀️"))
+        content_layout.addWidget(QRadioButton("Dark Mode 🌙"))
 
-        contentLayout.addWidget(QLabel("🔊 Volume:"))
+        content_layout.addWidget(QLabel("🔊 Volume:"))
         slider = QSlider(Qt.Horizontal)
         slider.setValue(40)
-        contentLayout.addWidget(slider)
+        content_layout.addWidget(slider)
 
         progress = QProgressBar()
         progress.setValue(70)
-        contentLayout.addWidget(progress)
+        content_layout.addWidget(progress)
 
-        contentLayout.addWidget(QSpinBox())
-        contentLayout.addWidget(QDateEdit())
+        content_layout.addWidget(QSpinBox())
+        content_layout.addWidget(QDateEdit())
 
-        contentLayout.addWidget(QLabel("🧾 Bio:"))
-        textEdit = QTextEdit()
-        textEdit.setPlaceholderText("Tell us something cool...")
-        contentLayout.addWidget(textEdit)
+        content_layout.addWidget(QLabel("🧾 Bio:"))
+        text_edit = QTextEdit()
+        text_edit.setPlaceholderText("Tell us something cool...")
+        content_layout.addWidget(text_edit)
 
-        contentLayout.addWidget(QPushButton("🚀 Launch!"))
+        content_layout.addWidget(QPushButton("🚀 Launch!"))
 
-        # Set layout
-        section.set_content_layout(contentLayout)
+        # Set the content widget using the property
+        section.widget = content_widget
 
         # 🌟 Main layout
+        # 🌟 Main layout
         container = QWidget()
-        mainLayout = QHBoxLayout(container)
-        mainLayout.addWidget(section)
+        main_layout = QVBoxLayout(container)
+        main_layout.addWidget(section)
+        main_layout.setAlignment(section, Qt.AlignTop)  # <--- THIS does the magic
         self.setCentralWidget(container)
+

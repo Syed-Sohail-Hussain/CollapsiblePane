@@ -1,9 +1,7 @@
 from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QAbstractAnimation
 from PySide6.QtWidgets import (
-    QWidget, QToolButton, QScrollArea, QGridLayout, QVBoxLayout,
-    QHBoxLayout, QLabel, QPushButton, QSizePolicy, QApplication, QMainWindow
+    QWidget, QToolButton, QScrollArea, QGridLayout, QSizePolicy
 )
-import sys
 
 
 class CollapsiblePane(QWidget):
@@ -16,27 +14,28 @@ class CollapsiblePane(QWidget):
         self.content_area = QScrollArea(self)
         self.main_layout = QGridLayout(self)
 
-        # Toggle button style and behavior
+        # Toggle button setup
         self.toggle_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         self.toggle_button.setArrowType(Qt.RightArrow)
         self.toggle_button.setText(title)
         self.toggle_button.setCheckable(True)
         self.toggle_button.setChecked(False)
         self.toggle_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.toggle_button.setStyleSheet(self._generate_button_style("#444", "#eee"))  # default colors
+        self.toggle_button.setStyleSheet(self._generate_button_style("#444", "#eee"))
 
-        # Content area settings
+        # Content area setup
         self.content_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.content_area.setMaximumHeight(0)
         self.content_area.setMinimumHeight(0)
         self.content_area.setStyleSheet("QScrollArea { background-color: transparent; border: none; }")
+        self.content_area.setWidgetResizable(True)
 
-        # Add animations
+        # Animations
         self.toggle_animation.addAnimation(QPropertyAnimation(self, b"minimumHeight"))
         self.toggle_animation.addAnimation(QPropertyAnimation(self, b"maximumHeight"))
         self.toggle_animation.addAnimation(QPropertyAnimation(self.content_area, b"maximumHeight"))
 
-        # Layout
+        # Layout setup
         self.main_layout.setVerticalSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.addWidget(self.toggle_button, 0, 0)
@@ -45,7 +44,7 @@ class CollapsiblePane(QWidget):
 
         self.toggle_button.toggled.connect(self.toggle)
 
-    def _generate_button_style(self, bg_color: str, fg_color: str) -> str:
+    def _generate_button_style(self, bg_color: str="#0066ff", fg_color: str="#ffffff") -> str:
         return f"""
         QToolButton {{
             background-color: {bg_color};
@@ -66,32 +65,37 @@ class CollapsiblePane(QWidget):
         }}
         """)
 
-
     def set_title_bar_style(self, background_color: str, foreground_color: str):
         self.toggle_button.setStyleSheet(
             self._generate_button_style(background_color, foreground_color)
         )
 
-    def set_content_layout(self, content_layout):
-        oldLayout = self.content_area.layout()
-        if oldLayout is not None:
-            QWidget().setLayout(oldLayout)
+    @property
+    def widget(self) -> QWidget:
+        return self.content_area.widget()
 
-        self.content_area.setLayout(content_layout)
+    @widget.setter
+    def widget(self, widget: QWidget):
+        # Remove old widget if any
+        if self.content_area.widget():
+            old_widget = self.content_area.widget()
+            old_widget.setParent(None)
 
-        collapsedHeight = self.sizeHint().height() - self.content_area.maximumHeight()
-        contentHeight = content_layout.sizeHint().height()
+        self.content_area.setWidget(widget)
+
+        collapsed_height = self.sizeHint().height() - self.content_area.maximumHeight()
+        content_height = widget.sizeHint().height()
 
         for i in range(self.toggle_animation.animationCount() - 1):
             animation = self.toggle_animation.animationAt(i)
             animation.setDuration(self.animation_duration)
-            animation.setStartValue(collapsedHeight)
-            animation.setEndValue(collapsedHeight + contentHeight)
+            animation.setStartValue(collapsed_height)
+            animation.setEndValue(collapsed_height + content_height)
 
-        contentAnimation = self.toggle_animation.animationAt(self.toggle_animation.animationCount() - 1)
-        contentAnimation.setDuration(self.animation_duration)
-        contentAnimation.setStartValue(0)
-        contentAnimation.setEndValue(contentHeight)
+        content_anim = self.toggle_animation.animationAt(self.toggle_animation.animationCount() - 1)
+        content_anim.setDuration(self.animation_duration)
+        content_anim.setStartValue(0)
+        content_anim.setEndValue(content_height)
 
     def toggle(self, collapsed):
         if collapsed:
