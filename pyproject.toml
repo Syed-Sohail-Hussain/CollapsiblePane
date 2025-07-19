@@ -1,6 +1,6 @@
 [project]
 name = "collapsiblepane"
-version = "0.10.0"
+version = "0.10.1"
 description = "A PySide6 widget for collapsible panels, inspired by JavaFX's TitledPane"
 readme = "README.md"
 license = "MIT"
