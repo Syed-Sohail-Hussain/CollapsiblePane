@@ -3,10 +3,11 @@ import sys
 from PySide6.QtWidgets import (
     QMainWindow, QVBoxLayout, QLabel, QPushButton, QLineEdit,
     QComboBox, QCheckBox, QRadioButton, QSlider, QProgressBar,
-    QSpinBox, QDateEdit, QTextEdit, QWidget, QHBoxLayout, QApplication
+    QSpinBox, QDateEdit, QTextEdit, QWidget, QApplication
 )
 from PySide6.QtCore import Qt
-from collapsible_pane import CollapsiblePane
+
+from collapsiblepane import CollapsiblePane
 
 
 class Window(QMainWindow):
@@ -63,13 +64,17 @@ class Window(QMainWindow):
         content_layout.addWidget(QPushButton("🚀 Launch!"))
 
         # Set the content widget using the property
-        section.widget = content_widget
+        section.content_widget = content_widget
+
 
         # 🌟 Main layout
         # 🌟 Main layout
         container = QWidget()
         main_layout = QVBoxLayout(container)
         main_layout.addWidget(section)
+        button=QPushButton(self)
+        main_layout.addWidget(button)
+        button.clicked.connect(section.clear_widget)
         main_layout.setAlignment(section, Qt.AlignTop)  # <--- THIS does the magic
         self.setCentralWidget(container)
 

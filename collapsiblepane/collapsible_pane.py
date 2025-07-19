@@ -1,12 +1,15 @@
-from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QAbstractAnimation
+from PySide6.QtCore import Qt, QPropertyAnimation, QParallelAnimationGroup, QAbstractAnimation, Signal, QEasingCurve
 from PySide6.QtWidgets import (
     QWidget, QToolButton, QScrollArea, QGridLayout, QSizePolicy
 )
 
 
 class CollapsiblePane(QWidget):
+    toggled = Signal(bool)
+
     def __init__(self, title="", animation_duration=100, parent=None):
         super().__init__(parent)
+
         self.animation_duration = animation_duration
 
         self.toggle_button = QToolButton(self)
@@ -56,6 +59,28 @@ class CollapsiblePane(QWidget):
         QToolButton::menu-indicator {{ image: none; }}
         """
 
+    def clear_widget(self):
+        if self.content_area.widget():
+            old = self.content_area.widget()
+            self.content_area.takeWidget()
+            old.deleteLater()
+
+        # Reset animation values so the pane collapses properly
+        collapsed_height = self.sizeHint().height() - self.content_area.maximumHeight()
+
+        for i in range(self.toggle_animation.animationCount() - 1):
+            animation = self.toggle_animation.animationAt(i)
+            animation.setStartValue(collapsed_height)
+            animation.setEndValue(collapsed_height)
+            animation.setEasingCurve(QEasingCurve.OutCubic)
+
+        content_anim = self.toggle_animation.animationAt(self.toggle_animation.animationCount() - 1)
+        content_anim.setStartValue(0)
+        content_anim.setEndValue(0)
+
+        # Also collapse the pane visually
+        self.content_area.setMaximumHeight(0)
+
     def set_content_style(self, background_color="#ffffff", border_color="#cccccc", border_width=1, border_style="solid"):
         self.content_area.setStyleSheet(f"""
         QScrollArea {{
@@ -71,12 +96,15 @@ class CollapsiblePane(QWidget):
         )
 
     @property
-    def widget(self) -> QWidget:
+    def content_widget(self) -> QWidget:
         return self.content_area.widget()
 
-    @widget.setter
-    def widget(self, widget: QWidget):
+    @content_widget.setter
+    def content_widget(self, widget: QWidget):
         # Remove old widget if any
+        if self.content_area.widget() is widget:
+            return  # No need to do anything
+
         if self.content_area.widget():
             old_widget = self.content_area.widget()
             old_widget.setParent(None)
@@ -91,17 +119,54 @@ class CollapsiblePane(QWidget):
             animation.setDuration(self.animation_duration)
             animation.setStartValue(collapsed_height)
             animation.setEndValue(collapsed_height + content_height)
+            animation.setEasingCurve(QEasingCurve.OutCubic)
 
         content_anim = self.toggle_animation.animationAt(self.toggle_animation.animationCount() - 1)
         content_anim.setDuration(self.animation_duration)
         content_anim.setStartValue(0)
         content_anim.setEndValue(content_height)
 
-    def toggle(self, collapsed):
+    @property
+    def is_expanded(self):
+        return self.toggle_button.isChecked()
+
+    def toggle(self, collapsed: bool):
+        self.toggled.emit(collapsed)
+
         if collapsed:
             self.toggle_button.setArrowType(Qt.DownArrow)
-            self.toggle_animation.setDirection(QAbstractAnimation.Forward)
         else:
             self.toggle_button.setArrowType(Qt.RightArrow)
-            self.toggle_animation.setDirection(QAbstractAnimation.Backward)
+
+        # If there's no content widget, skip animation
+        content = self.content_area.widget()
+        if content is None:
+            self.content_area.setMaximumHeight(0)
+            return
+
+        # Compute heights for animation
+        collapsed_height = self.toggle_button.sizeHint().height()
+        content_height = content.sizeHint().height()
+
+        for i in range(self.toggle_animation.animationCount() - 1):
+            anim = self.toggle_animation.animationAt(i)
+            anim.setStartValue(collapsed_height)
+            anim.setEndValue(collapsed_height + content_height)
+            anim.setEasingCurve(QEasingCurve.OutCubic)
+
+        content_anim = self.toggle_animation.animationAt(self.toggle_animation.animationCount() - 1)
+        content_anim.setStartValue(0)
+        content_anim.setEndValue(content_height)
+
+        # Animate
+        if self.toggle_animation.state() == QAbstractAnimation.Running:
+            self.toggle_animation.setDirection(
+                QAbstractAnimation.Backward if self.toggle_animation.direction() == QAbstractAnimation.Forward else QAbstractAnimation.Forward
+            )
+        else:
+            self.toggle_animation.setDirection(
+                QAbstractAnimation.Forward if collapsed else QAbstractAnimation.Backward
+            )
+
         self.toggle_animation.start()
+

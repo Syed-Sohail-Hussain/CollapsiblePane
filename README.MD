@@ -93,7 +93,7 @@ class Window(QMainWindow):
         content_layout.addWidget(QPushButton("🚀 Launch!"))
 
         # Set the content widget using the property
-        section.widget = content_widget
+        section.content_widget = content_widget
 
         # 🌟 Main layout
         container = QWidget()
@@ -101,7 +101,8 @@ class Window(QMainWindow):
         main_layout.addWidget(section)
         main_layout.setAlignment(section, Qt.AlignTop)  # <--- THIS does the magic
         self.setCentralWidget(container)
-        
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
@@ -163,8 +164,4 @@ Toggles the expansion or collapse of the pane. Called automatically on toggle bu
 This widget is conceptually inspired by **JavaFX’s **`` , ported to PySide6/Qt with support for custom styling and animations.
 
 ---
-
-## 📜 License
-
-This code is intended for internal or educational use. If needed, wrap with your preferred open-source license.
 
