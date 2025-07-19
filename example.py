@@ -1,7 +1,9 @@
+import sys
+
 from PySide6.QtWidgets import (
     QMainWindow, QVBoxLayout, QLabel, QPushButton, QLineEdit,
     QComboBox, QCheckBox, QRadioButton, QSlider, QProgressBar,
-    QSpinBox, QDateEdit, QTextEdit, QWidget, QHBoxLayout
+    QSpinBox, QDateEdit, QTextEdit, QWidget, QHBoxLayout, QApplication
 )
 from PySide6.QtCore import Qt
 from collapsible_pane import CollapsiblePane
@@ -71,3 +73,9 @@ class Window(QMainWindow):
         main_layout.setAlignment(section, Qt.AlignTop)  # <--- THIS does the magic
         self.setCentralWidget(container)
 
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = Window()
+    window.resize(400, 300)
+    window.show()
+    sys.exit(app.exec())
