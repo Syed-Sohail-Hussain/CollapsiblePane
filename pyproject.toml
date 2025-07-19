@@ -1,9 +1,9 @@
 [project]
 name = "collapsiblepane"
-version = "0.1.0"
+version = "0.10.0"
 description = "A PySide6 widget for collapsible panels, inspired by JavaFX's TitledPane"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Muhammad Junaid Khalid", email = "mjk22071998@gmail.com"}
 ]
@@ -16,3 +16,6 @@ Repository = "https://github.com/mjk22071998/CollapsiblePane"
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["collapsiblepane"]

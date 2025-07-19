@@ -1,48 +1,54 @@
 # CollapsiblePane (PySide6)
 
-The `CollapsiblePane` is a reusable Qt widget for PySide6 that allows dynamic expansion and collapsing of a content area. It mimics the behavior of JavaFX’s `TitledPane` and is designed to group form sections, tool panels, or other widgets under an interactive toggle button.
+The `CollapsiblePane` is a reusable and customizable PySide6 widget that allows users to toggle the visibility of a content area with smooth animations—perfect for organizing UI sections. It mimics JavaFX’s `TitledPane` behavior and is designed to cleanly encapsulate widgets within collapsible sections.
+
+Inspired by JavaFX's TitledPane.
 
 ---
 
-## 📆 Class Overview
+## Features
 
-```python
-class CollapsiblePane(QWidget):
+- Expand/Collapse content with animation
+- Fully customizable title bar and content styling
+- Add or replace content widgets easily
+- Clean, layout-friendly design
+- Signal support for toggled state
+
+---
+
+## Installation
+
+```bash
+pip install collapsiblepane
 ```
 
-A custom QWidget subclass that includes:
+Or if you're testing locally:
 
-- A toggleable title bar (`QToolButton`)
-- A collapsible content area (`QScrollArea`)
-- Animation support using `QParallelAnimationGroup` and `QPropertyAnimation`
-
----
-
-## ✅ Key Features
-
-- Smooth vertical expansion/collapse animations
-- Fully customizable title bar and content area styles
-- Supports custom styling via colors, borders, and fonts
-- Layout-agnostic content insertion via `widget property`
-- Clean and minimal default design, easily adaptable
+```bash
+pip install dist/collapsiblepane-0.1.0-py3-none-any.whl
+```
 
 ---
 
-## 📸 Demo Preview
-
-| Collapsed | Expanded |
-| --------- | -------- |
-|      ![Collapsed View](screenshot/collapsed.PNG)     | ![Expanded View](screenshot/expanded.PNG) |
-
----
-
-## 🧪 Usage Example
+## Usage
 
 ```python
+import sys
+
+from PySide6.QtWidgets import (
+    QMainWindow, QVBoxLayout, QLabel, QPushButton, QLineEdit,
+    QComboBox, QCheckBox, QRadioButton, QSlider, QProgressBar,
+    QSpinBox, QDateEdit, QTextEdit, QWidget, QApplication
+)
+from PySide6.QtCore import Qt
+
+from collapsiblepane import CollapsiblePane
+
+
 class Window(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Flex Zone 🧹")
+        self.setWindowTitle("Flex Zone 🧩")
 
         # Create the collapsible pane
         section = CollapsiblePane("🔥 Ultimate Pane of Power", 150, self)
@@ -64,7 +70,7 @@ class Window(QMainWindow):
         content_layout.addWidget(QLineEdit("Name here..."))
         content_layout.addWidget(QLineEdit("Email address..."))
 
-        content_layout.addWidget(QLabel("🕽️ Choose a category:"))
+        content_layout.addWidget(QLabel("🔽 Choose a category:"))
         combo = QComboBox()
         combo.addItems(["Developer", "Designer", "Hacker", "Wizard"])
         content_layout.addWidget(combo)
@@ -95,13 +101,17 @@ class Window(QMainWindow):
         # Set the content widget using the property
         section.content_widget = content_widget
 
+
+        # 🌟 Main layout
         # 🌟 Main layout
         container = QWidget()
         main_layout = QVBoxLayout(container)
         main_layout.addWidget(section)
+        button=QPushButton(self)
+        main_layout.addWidget(button)
+        button.clicked.connect(section.clear_widget)
         main_layout.setAlignment(section, Qt.AlignTop)  # <--- THIS does the magic
         self.setCentralWidget(container)
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -113,49 +123,41 @@ if __name__ == "__main__":
 
 ---
 
-## 🔧 Public Methods
+## Screenshot
 
-### `__init__(title: str = "", animation_duration: int = 100, parent: QWidget = None)`
+| Collapsed | Expanded |
+| --------- | -------- |
+|![Collapsed View](https://raw.githubusercontent.com/mjk22071998/CollapsiblePane/refs/heads/main/screenshot/expanded.PNG)|![Expanded View](https://raw.githubusercontent.com/mjk22071998/CollapsiblePane/refs/heads/main/screenshot/expanded.PNG)|
 
-Creates a collapsible pane with a given title and animation duration (in ms).
-
----
-
-### `set_title_bar_style(background_color: str, foreground_color: str)`
-
-Sets the background and foreground (text) color of the title bar toggle button.
+> Ensure these URLs point to actual image files in your GitHub repo. Raw links must be used for PyPI to render them.
 
 ---
 
-### `set_content_style(background_color="#ffffff", border_color="#cccccc", border_width=1, border_style="solid")`
+## API Overview
 
-Sets the content area's background and border styling.
+### Constructor
 
----
+```python
+CollapsiblePane(title="", animation_duration=100)
+```
 
-### `widget` property
+### Properties
 
-Sets the widget to the pane.
+- `content_widget`: `QWidget`
+- `is_expanded`: `bool`
 
----
+### Methods
 
-### `toggle(collapsed: bool)`
+- `clear_widget()`
+- `set_content_style(background_color, border_color, ...)`
+- `set_title_bar_style(background_color, foreground_color)`
 
-Toggles the expansion or collapse of the pane. Called automatically on toggle button interaction.
+### Signals
 
----
-
-## 💡 Design Notes
-
-- The content area is implemented as a `QScrollArea`, allowing it to be expandable but scroll-free by default.
-- Animations are coordinated for both widget height and content height to provide smooth transitions.
-- The `QToolButton` is configured with a text label and arrow indicator, acting as the toggle.
-
----
-
-## 🏗️ Dependencies
-
-- PySide6 (`pip install PySide6`)
+- `toggled(bool)` — emits when pane expands or collapses
 
 ---
+
+## Contributions
+For contributions olease visit [Github Repository](https://github.com/mjk22071998/CollapsiblePane)
 
