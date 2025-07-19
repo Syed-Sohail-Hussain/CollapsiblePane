@@ -159,9 +159,3 @@ Toggles the expansion or collapse of the pane. Called automatically on toggle bu
 
 ---
 
-## 🮽 Inspiration
-
-This widget is conceptually inspired by **JavaFX’s **`` , ported to PySide6/Qt with support for custom styling and animations.
-
----
-
