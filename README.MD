@@ -34,12 +34,12 @@ from collapsiblepane import CollapsiblePane
 class Window(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Flex Zone 🧩")
+        self.setWindowTitle("Collapsible Pane Demo")
 
         # Create the collapsible pane
-        section = CollapsiblePane("🔥 Ultimate Pane of Power", 150, self)
+        section = CollapsiblePane("Example Section", 150, self)
 
-        # 🎨 Customize title bar
+        # Customize title bar appearance
         section.set_title_bar_style(background_color="#0066ff", foreground_color="#FFFFFF")
         section.set_content_style(
             background_color="#FFFFFF",
@@ -48,24 +48,24 @@ class Window(QMainWindow):
             border_style="solid"
         )
 
-        # 💎 Create a widget to hold the layout
+        # Create a widget to hold form elements
         content_widget = QWidget()
         content_layout = QVBoxLayout(content_widget)
 
-        content_layout.addWidget(QLabel("📝 Enter your details:"))
+        content_layout.addWidget(QLabel("Enter your details:"))
         content_layout.addWidget(QLineEdit("Name here..."))
         content_layout.addWidget(QLineEdit("Email address..."))
 
-        content_layout.addWidget(QLabel("🔽 Choose a category:"))
+        content_layout.addWidget(QLabel("Select a category:"))
         combo = QComboBox()
-        combo.addItems(["Developer", "Designer", "Hacker", "Wizard"])
+        combo.addItems(["Developer", "Designer", "Security Researcher", "Engineer"])
         content_layout.addWidget(combo)
 
-        content_layout.addWidget(QCheckBox("Subscribe to newsletter 📬"))
-        content_layout.addWidget(QRadioButton("Light Mode ☀️"))
-        content_layout.addWidget(QRadioButton("Dark Mode 🌙"))
+        content_layout.addWidget(QCheckBox("Subscribe to newsletter"))
+        content_layout.addWidget(QRadioButton("Light Mode"))
+        content_layout.addWidget(QRadioButton("Dark Mode"))
 
-        content_layout.addWidget(QLabel("🔊 Volume:"))
+        content_layout.addWidget(QLabel("Volume:"))
         slider = QSlider(Qt.Horizontal)
         slider.setValue(40)
         content_layout.addWidget(slider)
@@ -77,27 +77,29 @@ class Window(QMainWindow):
         content_layout.addWidget(QSpinBox())
         content_layout.addWidget(QDateEdit())
 
-        content_layout.addWidget(QLabel("🧾 Bio:"))
+        content_layout.addWidget(QLabel("Bio:"))
         text_edit = QTextEdit()
-        text_edit.setPlaceholderText("Tell us something cool...")
+        text_edit.setPlaceholderText("Tell us about yourself...")
         content_layout.addWidget(text_edit)
 
-        content_layout.addWidget(QPushButton("🚀 Launch!"))
+        content_layout.addWidget(QPushButton("Submit"))
 
-        # Set the content widget using the property
+        # Set the content widget
         section.content_widget = content_widget
 
-
-        # 🌟 Main layout
-        # 🌟 Main layout
+        # Main layout setup
         container = QWidget()
         main_layout = QVBoxLayout(container)
         main_layout.addWidget(section)
-        button=QPushButton(self)
-        main_layout.addWidget(button)
-        button.clicked.connect(section.clear_widget)
-        main_layout.setAlignment(section, Qt.AlignTop)  # <--- THIS does the magic
+
+        # Button to clear collapsible pane content
+        clear_button = QPushButton("Clear Section", self)
+        clear_button.clicked.connect(section.clear_widget)
+        main_layout.addWidget(clear_button)
+
+        main_layout.setAlignment(section, Qt.AlignTop)
         self.setCentralWidget(container)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -105,6 +107,7 @@ if __name__ == "__main__":
     window.resize(400, 300)
     window.show()
     sys.exit(app.exec())
+
 ```
 
 ---
@@ -115,7 +118,6 @@ if __name__ == "__main__":
 |---------------------------------------------------------------------------------------------------------------------------| -------- |
 | ![Collapsed View](https://raw.githubusercontent.com/mjk22071998/CollapsiblePane/refs/heads/main/screenshot/collapsed.PNG) |![Expanded View](https://raw.githubusercontent.com/mjk22071998/CollapsiblePane/refs/heads/main/screenshot/expanded.PNG)|
 
-> Ensure these URLs point to actual image files in your GitHub repo. Raw links must be used for PyPI to render them.
 
 ---
 
@@ -145,5 +147,5 @@ CollapsiblePane(title="", animation_duration=100)
 ---
 
 ## Contributions
-For contributions olease visit [Github Repository](https://github.com/mjk22071998/CollapsiblePane)
+For contributions please visit [Github Repository](https://github.com/mjk22071998/CollapsiblePane)
 
