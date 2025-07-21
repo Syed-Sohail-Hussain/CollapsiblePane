@@ -1,4 +1,4 @@
-# CollapsiblePane (PySide6)
+# CollapsiblePane (PySide6) [![PyPI Downloads](https://static.pepy.tech/badge/collapsiblepane)](https://pepy.tech/projects/collapsiblepane)
 
 The `CollapsiblePane` is a reusable and customizable PySide6 widget that allows users to toggle the visibility of a content area with smooth animations—perfect for organizing UI sections. It mimics JavaFX’s `TitledPane` behavior and is designed to cleanly encapsulate widgets within collapsible sections.
 
