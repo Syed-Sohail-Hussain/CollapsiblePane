@@ -9,6 +9,10 @@ class CollapsiblePane(QWidget):
 
     def __init__(self, title="", animation_duration=100, parent=None):
         super().__init__(parent)
+        if title is not str:
+            return
+        if animation_duration is not int:
+            return
 
         self.animation_duration = animation_duration
 
